@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CS-IA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
+.w3-sidebar {width: 120px;background: #222;}
+#main {margin-left: 120px}
+@media only screen and (max-width: 600px) {
+  #main {margin-left: 0;}
+  .w3-sidebar {width: 100%; height: auto; position: relative;}
+  .w3-sidebar a {display: inline-block; text-align: center; width: 25%;}
+}
+
+.w3-modal-content {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background-color: #333; /* Dark background to match the theme */
+    color: white; /* White text for contrast */
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Header */
+.w3-modal-header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50; /* Green accent */
+}
+
+/* Modal Buttons */
+.w3-modal .button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50; /* Green like your calendar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.w3-modal .button:hover {
+    background: #45a049;
+}
+
+/* Scrollable Content */
+.w3-modal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.w3-modal-content::-webkit-scrollbar-thumb {
+    background: #666; /* Darker scrollbar */
+    border-radius: 5px;
+}
+
+.w3-modal-content::-webkit-scrollbar-track {
+    background: #222; /* Background color matches sidebar */
+}
+
+.large-textbox {
+        width: 100%;
+        height: 100px;
+        font-size: 18px;
+}
+
+.clothing-container {
+    max-height: 80vh; /* Set maximum height for scrollable area */
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+/* Clothing Item Style */
+.clothing-item {
+    background-color: #444;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease;
+}
+
+.clothing-item:hover {
+    background-color: #555;
+}
+
+/* Scrollbar Style */
+.w3-modal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+</style>
+</head>
+<body class="w3-black">
+
+<!-- Sidebar Navigation -->
+<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+    <form method="POST" action={{ url_for('rerouting') }}>
+        <button type="submit" name="home" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-home w3-xlarge"></i>
+            <p>HOME</p>
+        </button>
+        <button type="submit" name="calendar" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-calendar w3-xlarge"></i>
+            <p>CALENDAR</p>
+        </button>
+        <button type="submit" name="clothing" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-shopping-bag w3-xlarge"></i>
+            <p>CLOTHING</p>
+        </button>
+        <button type="submit" name="generator" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-bolt w3-xlarge"></i>
+            <p>GENERATOR</p>
+        </button>
+        <button type="submit" name="settings" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-cog w3-xlarge"></i>
+            <p>SETTINGS</p>
+        </button>
+    </form>
+    <form method="POST" action="{{ url_for('logout') }}">
+        <button type="submit" class="w3-bar-item w3-button w3-padding-large w3-hover-red" style="border: none; background: none; width: 100%;">
+            <i class="fa fa-sign-out-alt w3-xlarge"></i>
+            <p>LOGOUT</p>
+        </button>
+    </form>
+</nav>
+
+<!-- Main Page Content -->
+<div class="w3-padding-large" id="main">
+    <h1>Clothing Items</h1>
+    <div class="clothing-container">
+    {% for item in clothes %}
+        <div class="clothing-item" data-item="{{ clothes[item] }}" onclick="showDetails(this)" style="display: flex; align-items: center; padding: 10px;">
+            <div style="flex-grow: 1;">
+                <h3>{{ clothes[item]["name"] }}</h3>
+                <p>Category: {{ clothes[item]["category"] }}</p>
+                <p>Color: {{ clothes[item]["color"] }}</p>
+            </div>
+            <!-- Add to Trip Wardrobe Button -->
+            <button type="button" class="w3-button w3-small w3-blue" data-item="{{ item }}" onclick="openAddToWardrobeModal(event, this)">Add to Trip</button>
+        </div>
+    {% endfor %}
+    </div>
+
+    <!-- Add to Trip Wardrobe Modal -->
+    <div id="add-to-wardrobe-modal" class="w3-modal">
+    <div class="w3-modal-content">
+        <span onclick="document.getElementById('add-to-wardrobe-modal').style.display='none'" class="w3-button w3-large w3-right">&times;</span>
+        <div id="modal-content-2" class="w3-padding">
+            <h3>Adding Item to Trip Wardrobe</h3>
+            <form id="add-clothes-to-trip" action="/add-to-trip-wardrobe" method="POST">
+                <!-- Item Name -->
+                <div>
+                    <label for="item-name">Item Name:</label>
+                    <input type="text" id="item-name" name="name" class="w3-input w3-margin-bottom" readonly>
+                </div>
+
+                <!-- Item ID (hidden field) -->
+                <input type="hidden" id="data-item" name="item_id">
+
+                <!-- Trip Selection Dropdown -->
+                <div>
+                    <label for="trip">Select Trip:</label>
+                    <select id="trip" name="trip" class="w3-input w3-margin-bottom">
+                        <option value="" disabled selected>Select a trip</option>
+                        {% for trip in trips %}
+                            <option value="{{ trip[0] }}">{{ trip[2] }} ({{ trip[3] }} to {{ trip[4] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="w3-button w3-green">Add to Wardrobe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- Other buttons for other modals -->
+    <button class="w3-button w3-green w3-large" onclick="document.getElementById('modal').style.display='block'">Add Clothing</button>
+    <button class="w3-button w3-blue w3-large" onclick="document.getElementById('ai-modal').style.display='block'">Add AI</button>
+</div>
+
+
+    <div id="modal" class="w3-modal">
+    <div class="w3-modal-content">
+        <form action="/clothing" method="POST">
+        <div class="w3-modal-header">
+            <span onclick="document.getElementById('modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+            Modal Title
+        </div>
+        <div class="w3-modal-body">
+            <!-- Text Input for Clothing Name -->
+            <label for="name">Clothing Name:</label>
+            <input type="text" id="clothing-name" name="name" class="w3-input w3-margin-bottom" placeholder="Enter clothing name" required>
+
+            <!-- Dropdown for Clothing Type -->
+            <label for="clothing-type">Type:</label>
+            <select id="clothing-type" name="category" class="w3-select w3-margin-bottom" onchange="updateAttributes()">
+                <option value="">Select Category</option>
+                <option value="underwear">Underwear</option>
+                <option value="shirt">Shirt</option>
+                <option value="bottoms">Bottoms</option>
+                <option value="jacket">Jacket</option>
+                <option value="suit">Suit</option>
+                <option value="sweater">Sweater/Cardigan</option>
+                <option value="shoes">Shoes</option>
+                <option value="socks">Socks</option>
+                <option value="swimwear">Swimwear</option>
+                <option value="accessories">Accessories</option>
+            </select>
+
+            <!-- Dynamic Attributes -->
+            <div id="attributes"></div>
+        </div>
+        <div class="w3-modal-footer">
+            <button class="w3-button w3-black" name="close" id="close" onclick="document.getElementById('modal').style.display='none'">Close</button>
+            <button class="w3-button w3-black" name="submit" id="submit" onclick="document.getElementById('modal').style.display='none'">Submit</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div id="ai-modal" class="w3-modal">
+    <div class="w3-modal-content">
+        <div class="w3-modal-header">
+            <span onclick="document.getElementById('ai-modal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+            Add AI
+        </div>
+        <div class="w3-modal-body">
+            <!-- Form for submitting AI Name -->
+            <form id="ai-form" action="/clothing" method="POST">
+                <label for="ai-name">AI Name:</label>
+                <textarea id="ai-name" name="ai-name" class="w3-input w3-margin-bottom" placeholder="Enter AI name" style="width: 100%; height: 150px; font-size: 18px;" required></textarea>
+            </form>
+        </div>
+        <div class="w3-modal-footer">
+            <!-- Submit Button -->
+            <button class="w3-button w3-green" type="submit" form="ai-form" id="submit-btn">Submit</button>
+            <div id="loading-spinner" style="display: none; text-align: center;">
+                <i class="fa fa-spinner fa-spin w3-large"></i> Submitting...
+            </div>
+            <button class="w3-button w3-black" onclick="document.getElementById('ai-modal').style.display='none'">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="clothing-modal" class="w3-modal">
+    <div class="w3-modal-content">
+        <span onclick="document.getElementById('clothing-modal').style.display='none'" class="w3-button w3-large w3-right">&times;</span>
+        <div id="modal-content" class="w3-padding">
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function showLoading() {
+    // Hide the submit button and show the loading spinner
+    document.getElementById('submit-btn').style.display = 'none';
+    document.getElementById('loading-spinner').style.display = 'block';
+    }
+    // Function to update attributes based on the selected clothing category
+    function updateAttributes() {
+        var category = document.getElementById("clothing-type").value;
+        var attributesDiv = document.getElementById("attributes");
+        var attributesHTML = "";
+
+   switch (category) {
+        case "underwear":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "shirt":
+            attributesHTML = `
+                <label for="brand">Brand</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color</label><input type="text" name="color" id="color" class="w3-input w3-margin-bottom" required><br>
+                <label for="sleeve">Sleeve:</label>
+                <select id="sleeve" name="sleeve" class="w3-select w3-margin-bottom">
+                <option value="short sleeve">Short Sleeve</option>
+                <option value="long sleeve">Long Sleeve</option>
+                <option value="sleeveless">Sleeveless</option>
+                </select>
+                <label for="layering">Layering</label><input type="checkbox" id="layering" name="layering" class="w3-input w3-margin-bottom"><br>
+                <label for="fit">Fit:</label>
+                <select id="fit" name="fit" class="w3-select w3-margin-bottom">
+                <option value="regular">Regular</option>
+                <option value="oversized">Oversized</option>
+                <option value="slim">Slim</option>
+                </select>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "bottoms":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="fit">Fit:</label>
+                <select id="fit" name="fit" class="w3-select w3-margin-bottom">
+                <option value="regular">Regular</option>
+                <option value="oversized">Baggy</option>
+                <option value="slim">Slim</option>
+                </select>
+                <label for="length">Length:</label>
+                <select id="length" name="length" class="w3-select w3-margin-bottom">
+                <option value="shorts">Shorts</option>
+                <option value="regular">Regular</option>
+                </select>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+                <label for="type">Type:</label>
+                <select id="type" name="type" class="w3-select w3-margin-bottom">
+                <option value="jeans">Jeans</option>
+                <option value="sweatpants">Sweatpants</option>
+                <option value="dress pants">Dress Pants</option>
+                </select>
+            `;
+            break;
+        case "jacket":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="weather">Weather Suitability:</label>
+                <select id="weather" name="weather" class="w3-select w3-margin-bottom">
+                <option value="not_specified">Not specific</option>
+                <option value="rain">Rain</option>
+                <option value="windy">Windy</option>
+                <option value="snow">Snow</option>
+                </select>
+                <label for="climate">Climate:</label>
+                <select id="climate" name="climate" class="w3-select w3-margin-bottom">
+                <option value="moderate">Moderate</option>
+                <option value="cold">Cold</option>
+                <option value="warm">Warm</option>
+                </select>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "suit":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+                <label for="clothing-size">Wear Preference:</label>
+                <input type="range" id="clothing-size" name="preference" min="1" max="5" value="3" class="w3-slider w3-margin-bottom">
+            `;
+            break;
+        case "sweater":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+                <select id="fit" name="fit" class="w3-select w3-margin-bottom">
+                <option value="regular">Regular</option>
+                <option value="oversized">Oversized</option>
+                <option value="slim">Slim</option>
+                </select>
+                <label for="climate">Climate:</label>
+                <select id="climate" name="climate" class="w3-select w3-margin-bottom">
+                <option value="moderate">Moderate</option>
+                <option value="cold">Cold</option>
+                <option value="warm">Warm</option>
+                </select>
+                <label for="weather">Weather Suitability:</label>
+                <select id="weather" name="weather" class="w3-select w3-margin-bottom">
+                <option value="not_specified">Not specific</option>
+                <option value="rain">Rain</option>
+                <option value="windy">Windy</option>
+                <option value="snow">Snow</option>
+                </select>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "shoes":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+                <label for="type">Shoe Type:</label>
+                <select id="type" name="type" class="w3-select w3-margin-bottom">
+                <option value="sneakers">Sneakers</option>
+                <option value="boots">Boots</option>
+                <option value="dress shoes">Dress Shoes</option>
+                <option value="loafers">Loafers</option>
+                <option value="sandals">Sandals</option>
+                </select>
+                <label for="weather">Weather Suitability:</label>
+                <select id="weather" name="weather" class="w3-select w3-margin-bottom">
+                <option value="not_specified">Not specific</option>
+                <option value="rain">Rain</option>
+                <option value="snow">Snow</option>
+                </select>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "socks":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        case "swimwear":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="color">Color:</label><input type="text" id="color" name="color" class="w3-input w3-margin-bottom" required><br>
+            `;
+            break;
+        case "accessories":
+            attributesHTML = `
+                <label for="brand">Brand:</label><input type="text" id="brand" name="brand" class="w3-input w3-margin-bottom" required><br>
+                <label for="type">Type:</label><input type="text" id="type" name="type" class="w3-input w3-margin-bottom" required><br>
+                <label for="occasion">Occasion:</label>
+                <select id="occasion" name="occasion" class="w3-select w3-margin-bottom">
+                <option value="casual">Casual</option>
+                <option value="formal">Formal</option>
+                <option value="sport">Sports</option>
+                </select>
+            `;
+            break;
+        default:
+            attributesHTML = "<p>Please select a clothing category to see options.</p>";
+    }
+
+        attributesDiv.innerHTML = attributesHTML;
+    }
+    function showDetails(element) {
+        let itemDataString = element.getAttribute("data-item");
+        itemDataString = itemDataString.replace(/'([^']+)'/g, '"$1"');
+        itemDataString = itemDataString.replace(/\bTrue\b/g, '"Yes"').replace(/\bFalse\b/g, '"No"');
+        let itemData = JSON.parse(itemDataString);
+        let capitalizedItemData = {};
+        for (let key in itemData) {
+            let capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+            capitalizedItemData[capitalizedKey] = typeof itemData[key] === 'string'
+            ? (itemData[key] === "not_specified" ? "Not specified" : itemData[key].charAt(0).toUpperCase() + itemData[key].slice(1))
+            : itemData[key];
+        }
+        console.log(itemData)
+
+        var modalContent = `
+            <div class="modal-header">
+                <form id="remove-item" action="/remove_item" method="POST">
+                    <input type="hidden" name="item_name" value="${itemData.name}">
+                    <button class="w3-button w3-black" type="submit">Remove</button>
+                </form>
+                <h2>Details for ${itemData.name}</h2>
+            </div>
+            <div class="modal-body">`;
+        for (let attribute in capitalizedItemData) {
+            if (attribute != "Name")
+            modalContent += `<p><strong>${attribute}:</strong> ${capitalizedItemData[attribute]}</p>`;
+        }
+
+        modalContent += `
+                        </div>`;
+        document.getElementById('modal-content').innerHTML = modalContent;
+        document.getElementById('clothing-modal').style.display = 'block';
+
+
+        // Close the modal if clicked outside of it
+        window.onclick = function (event) {
+            var modal = document.getElementById('clothing-modal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    };
+
+
+    function openAddToWardrobeModal(event, button) {
+        event.stopPropagation();
+    // Get the item data from the clicked button
+    var itemId = button.getAttribute('data-item');
+    // Set the value in the hidden input field
+    document.getElementById('data-item').value = itemId;
+
+    // Optionally, set other fields in the modal, like the item name
+    var itemName = button.closest('.clothing-item').querySelector('h3').textContent;
+    document.getElementById('item-name').value = itemName;
+
+    // Show the modal
+    document.getElementById('add-to-wardrobe-modal').style.display = 'block';
+    }
+</script>
+
+</div>
+
+</body>
+</html>

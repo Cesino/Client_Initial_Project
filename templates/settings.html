@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CS-IA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
+.w3-sidebar {width: 120px;background: #222;}
+#main {margin-left: 120px}
+@media only screen and (max-width: 600px) {
+  #main {margin-left: 0;}
+  .w3-sidebar {width: 100%; height: auto; position: relative;}
+  .w3-sidebar a {display: inline-block; text-align: center; width: 25%;}
+}
+</style>
+</head>
+<body class="w3-black">
+
+<!-- Sidebar Navigation -->
+<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+    <form method="POST" action={{ url_for('rerouting') }}>
+        <button type="submit" name="home" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-home w3-xlarge"></i>
+            <p>HOME</p>
+        </button>
+        <button type="submit" name="calendar" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-calendar w3-xlarge"></i>
+            <p>CALENDAR</p>
+        </button>
+        <button type="submit" name="clothing" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-shopping-bag w3-xlarge"></i>
+            <p>CLOTHING</p>
+        </button>
+        <button type="submit" name="generator" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-bolt w3-xlarge"></i>
+            <p>GENERATOR</p>
+        </button>
+        <button type="submit" name="settings" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-cog w3-xlarge"></i>
+            <p>SETTINGS</p>
+        </button>
+    </form>
+    <form method="POST" action="{{ url_for('logout') }}">
+        <button type="submit" class="w3-bar-item w3-button w3-padding-large w3-hover-red" style="border: none; background: none; width: 100%;">
+            <i class="fa fa-sign-out-alt w3-xlarge"></i>
+            <p>LOGOUT</p>
+        </button>
+    </form>
+</nav>
+
+<!-- Main Page Content -->
+<div class="w3-padding-large" id="main">
+
+
+  <!-- Change Password Form -->
+  <div class="w3-container w3-padding-32 w3-card-4">
+    <h3>Change Password</h3>
+    <form method="POST" action="{{ url_for('change_password') }}">
+        <label for="new-password">New Password:</label>
+        <input type="password" id="new-password" name="new_password" class="w3-input w3-margin-bottom" required>
+
+        <label for="repeat-password">Repeat Password:</label>
+        <input type="password" id="repeat-password" name="repeat_password" class="w3-input w3-margin-bottom" required>
+
+        <button type="submit" class="w3-button w3-blue w3-margin-top">Change Password</button>
+    </form>
+  </div>
+
+    {% if error %}
+      <div class="w3-panel w3-red">
+        <p>{{ error }}</p>
+      </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

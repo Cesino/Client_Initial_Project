@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Login & Registration</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body, h1, h2 {
+    font-family: "Montserrat", sans-serif;
+}
+body, html{
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    width: 400px;
+    margin: auto;
+    padding: 20px;
+    background: #222;
+    color: white;
+    border-radius: 10px;
+}
+.input-group {
+    margin-bottom: 15px;
+}
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+.button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.button:hover {
+    background: #45a049;
+}
+.switch {
+    text-align: center;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body class="w3-black">
+
+<div class="container" id="login">
+  <h2 class="w3-center">Login</h2>
+    <form method="POST", action="/login">
+        <div class="input-group">
+            <input type="text" name="loginEmail" id="loginEmail" placeholder="Email" required>
+        </div>
+        <div class="input-group">
+            <input type="password" name="loginPwd" id="loginPwd" placeholder="Password" required>
+        </div>
+        <button class="button">Login</button>
+        <p class="switch">Don't have an account? <a href="/register">Register</a></p>
+    </form>
+</div>
+
+</body>
+</html>

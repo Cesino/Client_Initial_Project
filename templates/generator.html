@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CS-IA</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
+.w3-sidebar {width: 120px;background: #222;}
+#main {margin-left: 120px}
+@media only screen and (max-width: 600px) {
+  #main {margin-left: 0;}
+  .w3-sidebar {width: 100%; height: auto; position: relative;}
+  .w3-sidebar a {display: inline-block; text-align: center; width: 25%;}
+}
+
+.wardrobe-container {
+    max-height: 80vh; /* Set maximum height for scrollable area */
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+/* Modal Styles */
+.w3-modal-content {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background-color: #333; /* Dark background to match the theme */
+    color: white; /* White text for contrast */
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Header */
+.w3-modal-header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #4CAF50; /* Green accent */
+}
+
+/* Modal Buttons */
+.w3-modal .button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50; /* Green like your calendar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.w3-modal .button:hover {
+    background: #45a049;
+}
+
+/* Scrollable Content */
+.w3-modal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.w3-modal-content::-webkit-scrollbar-thumb {
+    background: #666; /* Darker scrollbar */
+    border-radius: 5px;
+}
+
+.w3-modal-content::-webkit-scrollbar-track {
+    background: #222; /* Background color matches sidebar */
+}
+
+.wardrobes-container {
+    max-height: 80vh; /* Set maximum height for scrollable area */
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+/* Clothing Item Style */
+.wardrobes-item {
+    background-color: #444;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease;
+}
+
+.clothing-container {
+    max-height: 50vh; /* Set maximum height for scrollable area */
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 50px;
+}
+
+.clothing-item {
+    background-color: #444;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease;
+}
+
+.clothing-item:hover {
+    background-color: #555;
+}
+
+.wardrobes-item:hover {
+    background-color: #555;
+}
+
+.add-item-button {
+    position: absolute;  /* Position it at the bottom */
+    bottom: 20px;  /* Adjust the distance from the bottom */
+    left: 50%;
+    transform: translateX(-50%);  /* Center it horizontally */
+    padding: 8px 16px;  /* Smaller padding for a smaller button */
+    font-size: 14px;  /* Smaller text */
+}
+
+</style>
+</head>
+<body class="w3-black">
+
+<!-- Sidebar Navigation -->
+<nav class="w3-sidebar w3-bar-block w3-small w3-hide-small w3-center">
+    <form method="POST" action={{ url_for('rerouting') }}>
+        <button type="submit" name="home" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-home w3-xlarge"></i>
+            <p>HOME</p>
+        </button>
+        <button type="submit" name="calendar" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-calendar w3-xlarge"></i>
+            <p>CALENDAR</p>
+        </button>
+        <button type="submit" name="clothing" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-shopping-bag w3-xlarge"></i>
+            <p>CLOTHING</p>
+        </button>
+        <button type="submit" name="generator" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-bolt w3-xlarge"></i>
+            <p>GENERATOR</p>
+        </button>
+        <button type="submit" name="settings" class="w3-bar-item w3-button w3-padding-large w3-hover-black">
+            <i class="fa fa-cog w3-xlarge"></i>
+            <p>SETTINGS</p>
+        </button>
+    </form>
+    <form method="POST" action="{{ url_for('logout') }}">
+        <button type="submit" class="w3-bar-item w3-button w3-padding-large w3-hover-red" style="border: none; background: none; width: 100%;">
+            <i class="fa fa-sign-out-alt w3-xlarge"></i>
+            <p>LOGOUT</p>
+        </button>
+    </form>
+</nav>
+
+<!-- Main Page Content -->
+<div class="w3-padding-large" id="main">
+  <header class="w3-container w3-padding-32 w3-center w3-black">
+  <div class="w3-center w3-padding-32">
+    <button onclick="document.getElementById('wardrobeModal').style.display='block'" class="w3-button w3-green w3-hover-shadow w3-xlarge">
+      <i class="fa fa-cabinet w3-xlarge"></i> Create a Wardrobe
+    </button>
+  </div>
+    </header>
+</div>
+
+<div id="trip-modal" class="w3-modal"
+     data-trip='{{ existing_trips }}'
+     data-wardrobes='{{ wardrobes }}'
+     data-items = '{{ user_items }}'
+>
+</div>
+
+<div class="w3-padding-large" id="main">
+    <h1>Wardrobes</h1>
+    <div class="wardrobes-container">
+    {% for wardrobe in wardrobes %}
+        <!-- Find the matching trip for this wardrobe -->
+        {% set showed_trip = existing_trips | selectattr(0, 'equalto', wardrobe[2]) | first %}
+
+        {% if showed_trip %}
+        <div class="wardrobes-item" data-item="{{ showed_trip[2] }}" data-wardrobe="{{ wardrobe[3] }}" trip_id="{{ wardrobe[2] }}"onclick="showDetails(this)">
+            <h3>{{ showed_trip[2] }}</h3>
+            <p>Start Date: {{ showed_trip[3] }}</p>
+            <p>End Date: {{ showed_trip[4] }}</p>
+        </div>
+        {% else %}
+            <!-- Optionally, show a message if no matching trip is found -->
+            <p>No trip found for this wardrobe item</p>
+        {% endif %}
+    {% endfor %}
+    </div>
+    <div id="wardrobe-modal" class="w3-modal">
+        <div class="w3-modal-content">
+            <button class="w3-button w3-small w3-red w3-right w3-hover-opacity" onclick="document.getElementById('wardrobe-modal').style.display='none'">
+                &times; <!-- This is the HTML entity for the "X" symbol -->
+            </button>
+            <div id="modal-content" class="w3-padding">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Creating a Wardrobe -->
+<div id="wardrobeModal" class="w3-modal">
+    <div class="w3-modal-content">
+        <div class="w3-modal-header">
+            <span onclick="document.getElementById('wardrobeModal').style.display='none'" class="w3-button w3-display-topright">&times;</span>
+            <h2>Select a Trip to Create a Wardrobe</h2>
+        </div>
+        <div class="w3-modal-body">
+            <form method="POST" action="{{ url_for('create_wardrobe') }}">
+                <label for="trip">Select Trip:</label>
+                <select name="trip_id" id="trip" class="w3-select">
+                    <!-- Populate this dropdown with trips from the database -->
+                    {% for trip in trips %}
+                        <option value="{{ trip[0] }}">{{ trip[2] }} ({{ trip[3] }} to {{ trip[4] }})</option>
+                    {% endfor %}
+                </select>
+                <br><br>
+                <button type="submit" class="w3-button w3-green w3-hover-shadow">Create Wardrobe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variable to store the wardrobe data
+var globalWardrobeData = {}
+var notusedWardrobe = user_items
+
+function showDetails(element) {
+    document.querySelector('.w3-button.w3-red').style.display = 'block';
+    // Retrieve the trip details from the clicked wardrobe item
+    let trip_id = element.getAttribute('trip_id')
+    let tripData = element.getAttribute('data-item');  // The trip data is assumed to be stored as a string
+    let wardrobeData = JSON.parse(element.getAttribute('data-wardrobe'));  // Parse the wardrobe data into an object
+
+    // Store the wardrobe data globally to show the list again when going back
+    globalWardrobeData = wardrobeData;
+
+    // Log wardrobe data for debugging
+    console.log(wardrobeData);
+
+    // Get the modal content area
+    let modalContent = document.getElementById('modal-content');
+    console.log(JSON.stringify(wardrobeData)); // Log the entire wardrobe data for verification
+
+    // Populate the modal with the trip and clothing items
+    let content = `
+        <h2>Wardrobe for Trip: ${tripData}</h2>
+        <div class="clothing-container">
+            ${Object.keys(wardrobeData).map(itemKey => {
+                const item = wardrobeData[itemKey];
+                // Correctly stringify the item for passing
+                const item_details = JSON.stringify(item).replace(/"/g, '&quot;');  // Escape quotes for safe HTML insertion
+                return `
+                    <div class="clothing-item">
+                        <h3>${item.name}</h3>
+                        <p>Category: ${item.category}</p>
+                        <p>Color: ${item.color}</p>
+                        <button data-item="${itemKey}" data-wardrobe="${item_details}" trip_id=${trip_id}" onclick="showItemDetails(this)">View Details</button>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+
+    // Update modal content with the wardrobe and trip data
+    modalContent.innerHTML = content;
+
+    // Show the modal
+    document.getElementById('wardrobe-modal').style.display = 'block';
+}
+
+// Function to handle more detailed view for each clothing item
+function showItemDetails(button) {
+    document.querySelector('.w3-button.w3-red').style.display = 'none';
+    let trip_id = button.getAttribute('trip_id');
+    let itemKey = button.getAttribute('data-item');
+    let item = JSON.parse(button.getAttribute('data-wardrobe').replace(/&quot;/g, '"'));
+
+    console.log(item); // Log the item to see its contents
+
+    // Capitalize the key and values for better readability (optional)
+    let capitalizedItemData = {};
+    for (let key in item) {
+        let capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+        let capitalizedValue = typeof item[key] === 'string'
+            ? (item[key] === "not_specified" ? "Not specified" : item[key].charAt(0).toUpperCase() + item[key].slice(1))
+            : item[key];
+        capitalizedItemData[capitalizedKey] = capitalizedValue;
+    }
+
+    // Get the modal content area
+    let modalContent = document.getElementById('modal-content');
+
+    // Populate the modal with item details
+    let content = `
+        <div class="modal-header">
+            <form id="remove-item" action="/remove_item_wardrobe" method="POST">
+                <input type="hidden" name="item_name" value="${itemKey},${trip_id}">
+                <button class="w3-button w3-black" type="submit">Remove</button>
+            </form>
+            <button onclick="goBack()" class="w3-button w3-black" style="position: absolute; top: 10px; right: 10px;">Back</button>
+            <h2>Details for ${item.name}</h2>
+        </div>
+        <div class="modal-body">
+    `;
+
+    // Loop through the attributes of the item and display them
+    for (let attribute in capitalizedItemData) {
+        if (attribute !== "Name") {  // You can exclude the 'name' if needed
+            content += `<p><strong>${attribute}:</strong> ${capitalizedItemData[attribute]}</p>`;
+        }
+    }
+
+    content += `</div>`;
+    modalContent.innerHTML = content;
+
+    // Show the modal
+    document.getElementById('wardrobe-modal').style.display = 'block';
+}
+
+// Function to go back to the wardrobe items list
+function goBack() {
+    document.querySelector('.w3-button.w3-red').style.display = 'block';
+    let modalContent = document.getElementById('modal-content');
+    let content = `
+        <h2>Wardrobe List</h2>
+        <div class="clothing-container">
+            ${Object.keys(globalWardrobeData).map(itemKey => {
+                const item = globalWardrobeData[itemKey];
+                const item_details = JSON.stringify(item).replace(/"/g, '&quot;');
+                return `
+                    <div class="clothing-item">
+                        <h3>${item.name}</h3>
+                        <p>Category: ${item.category}</p>
+                        <p>Color: ${item.color !== undefined ? item.color : ''}</p>
+                        <button data-item="${itemKey}" data-wardrobe="${item_details}" onclick="showItemDetails(this)">View Details</button>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+    modalContent.innerHTML = content;
+    document.getElementById('wardrobe-modal').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
